@@ -5,7 +5,6 @@ from pathlib import Path
 from flask import Flask, request, jsonify, render_template
 from flask_cors import CORS
 from dotenv import load_dotenv
-import anthropic
 from groq import Groq
 
 load_dotenv()
@@ -20,7 +19,6 @@ UPLOAD_FOLDER.mkdir(exist_ok=True)
 ALLOWED_EXTENSIONS = {"mp4", "mov", "avi", "mkv", "webm"}
 
 groq_client = Groq(api_key=os.getenv("GROQ_API_KEY"))
-anthropic_client = anthropic.Anthropic(api_key=os.getenv("ANTHROPIC_API_KEY"))
 
 
 def allowed_file(filename: str) -> bool:
@@ -82,13 +80,13 @@ TRANSCRIPCIÓN:
 
 Genera los 5 posts ahora:"""
 
-    message = anthropic_client.messages.create(
-        model="claude-sonnet-4-5",
+    response = groq_client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
         max_tokens=1024,
         messages=[{"role": "user", "content": prompt}],
     )
 
-    raw = message.content[0].text
+    raw = response.choices[0].message.content
     posts = [p.strip() for p in raw.split("---SEPARATOR---") if p.strip()]
     return posts[:5]
 
