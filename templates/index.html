@@ -303,7 +303,7 @@
         <div>
           <div class="flex items-center gap-2 mb-3">
             <span class="text-xs font-semibold text-cyan-400 uppercase tracking-widest">Long Copy</span>
-            <span class="text-xs text-gray-600">· narrativa completa · 220-280 chars</span>
+            <span class="text-xs text-gray-600">· narrativa completa · 300-400 chars</span>
           </div>
           <div id="postsLong" class="space-y-3"></div>
         </div>
@@ -453,6 +453,7 @@
         color: 'text-cyan-400',
         formulas: ['Historia Completa','Argumento Construido','Thread Starter','Mini Case Study','Lista de Valor','Manifiesto Personal'],
         range: [14, 20],
+        maxChars: 400,
       },
     ];
 
@@ -467,7 +468,8 @@
         slice.forEach((post, i) => {
           const globalIdx = group.range[0] + i;
           const charCount = post.length;
-          const isOver = charCount > 280;
+          const limit = group.maxChars || 280;
+          const isOver = charCount > limit;
           const formula = group.formulas[i] || `Post ${globalIdx + 1}`;
 
           const card = document.createElement('div');
@@ -476,7 +478,7 @@
           card.innerHTML = `
             <div class="flex items-center justify-between gap-3 mb-2">
               <span class="text-xs font-medium ${group.color}">${formula}</span>
-              <span class="text-xs ${isOver ? 'text-red-400' : 'text-gray-600'}">${charCount}/280</span>
+              <span class="text-xs ${isOver ? 'text-red-400' : 'text-gray-600'}">${charCount}/${limit}</span>
             </div>
             <p class="text-gray-200 text-sm leading-relaxed mb-3 whitespace-pre-line">${escapeHtml(post)}</p>
             <button

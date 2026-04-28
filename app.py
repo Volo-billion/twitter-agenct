@@ -64,7 +64,9 @@ LEYES DE LA VIRALIDAD QUE APLICAS:
 - Voz activa siempre. Nunca pasiva.
 
 REGLAS ABSOLUTAS:
-- Máximo 280 caracteres por post (cuenta espacios, hashtags, saltos de línea)
+- Short Copy: máximo 120 caracteres
+- Mid Copy: entre 120 y 220 caracteres
+- Long Copy: entre 300 y 400 caracteres (usa cada palabra, cuenta una historia completa)
 - Español latino directo. Sin relleno.
 - 1-2 hashtags ultra-específicos del tema. NUNCA: #Éxito #Motivación #Emprendimiento #Liderazgo
 - PROHIBIDO empezar con emoji — si usas uno, va al final del post
@@ -144,7 +146,7 @@ POST 13 — EL PROCESO REVELADO
 POST 14 — HISTORIA MICRO
 Situación reconocible (1 línea) → Giro inesperado (1 línea) → Lección aplicable (1 línea).
 
-═══ BLOQUE 3: LONG COPY (posts 15-20) — 220-280 chars cada uno ═══
+═══ BLOQUE 3: LONG COPY (posts 15-20) — entre 300 y 400 chars cada uno ═══
 
 POST 15 — HISTORIA COMPLETA
 Setup (contexto, 1 línea) → Conflicto (el problema, 1 línea) → Resolución (qué pasó, 1 línea) → Lección (el takeaway, 1 línea).
