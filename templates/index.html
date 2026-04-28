@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Video → Posts para X</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+    * { font-family: 'Inter', sans-serif; }
+
+    body {
+      background: #0a0a0f;
+      background-image:
+        radial-gradient(ellipse at 20% 50%, rgba(120, 40, 200, 0.15) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 20%, rgba(40, 80, 200, 0.12) 0%, transparent 50%);
+      min-height: 100vh;
+    }
+
+    .glass {
+      background: rgba(255,255,255,0.04);
+      border: 1px solid rgba(255,255,255,0.08);
+      backdrop-filter: blur(12px);
+    }
+
+    .glass-card {
+      background: rgba(255,255,255,0.03);
+      border: 1px solid rgba(255,255,255,0.06);
+    }
+
+    .gradient-text {
+      background: linear-gradient(135deg, #a78bfa, #60a5fa, #a78bfa);
+      background-size: 200% auto;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      animation: shimmer 3s linear infinite;
+    }
+
+    @keyframes shimmer {
+      to { background-position: 200% center; }
+    }
+
+    .drop-zone {
+      border: 2px dashed rgba(167, 139, 250, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .drop-zone:hover,
+    .drop-zone.drag-over {
+      border-color: rgba(167, 139, 250, 0.8);
+      background: rgba(167, 139, 250, 0.06);
+    }
+
+    .progress-bar-inner {
+      background: linear-gradient(90deg, #7c3aed, #3b82f6, #7c3aed);
+      background-size: 200% auto;
+      animation: progressShimmer 1.5s linear infinite;
+      transition: width 0.5s ease;
+    }
+
+    @keyframes progressShimmer {
+      to { background-position: 200% center; }
+    }
+
+    .pulse-dot {
+      animation: pulseDot 1.4s ease-in-out infinite;
+    }
+
+    @keyframes pulseDot {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.85); }
+    }
+
+    .post-card {
+      transition: all 0.25s ease;
+    }
+
+    .post-card:hover {
+      border-color: rgba(167, 139, 250, 0.35);
+      background: rgba(255,255,255,0.05);
+      transform: translateY(-1px);
+    }
+
+    .copy-btn {
+      transition: all 0.2s ease;
+    }
+
+    .copy-btn:hover {
+      background: rgba(167, 139, 250, 0.2);
+    }
+
+    .copy-btn.copied {
+      background: rgba(34, 197, 94, 0.2);
+      color: #4ade80;
+      border-color: rgba(74, 222, 128, 0.4);
+    }
+
+    .fade-in {
+      animation: fadeIn 0.5s ease forwards;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    .step-item {
+      transition: all 0.3s ease;
+    }
+
+    .step-item.active .step-dot {
+      background: #7c3aed;
+      box-shadow: 0 0 12px rgba(124, 58, 237, 0.6);
+    }
+
+    .step-item.done .step-dot {
+      background: #22c55e;
+    }
+
+    .step-item.waiting .step-dot {
+      background: rgba(255,255,255,0.15);
+    }
+
+    textarea {
+      resize: none;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(167,139,250,0.3) transparent;
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(167,139,250,0.3); border-radius: 3px; }
+  </style>
+</head>
+<body class="min-h-screen py-10 px-4">
+
+  <!-- Header -->
+  <div class="max-w-4xl mx-auto mb-10 text-center">
+    <div class="inline-flex items-center gap-2 glass rounded-full px-4 py-2 mb-6 text-xs text-purple-300">
+      <span class="w-2 h-2 rounded-full bg-purple-400 pulse-dot"></span>
+      Powered by Groq Whisper + Claude Sonnet
+    </div>
+    <h1 class="text-4xl md:text-5xl font-bold text-white mb-3">
+      Video → <span class="gradient-text">Posts para X</span>
+    </h1>
+    <p class="text-gray-400 text-lg">Sube tu video y obtén 5 posts listos para publicar en segundos.</p>
+  </div>
+
+  <!-- Main card -->
+  <div class="max-w-4xl mx-auto">
+
+    <!-- Upload panel -->
+    <div id="uploadPanel" class="glass rounded-2xl p-8 mb-6 fade-in">
+      <div
+        id="dropZone"
+        class="drop-zone rounded-xl p-12 text-center cursor-pointer relative"
+        onclick="document.getElementById('fileInput').click()"
+      >
+        <input
+          type="file"
+          id="fileInput"
+          class="hidden"
+          accept=".mp4,.mov,.avi,.mkv,.webm"
+        />
+
+        <!-- Default state -->
+        <div id="dropDefault">
+          <div class="w-16 h-16 rounded-2xl glass flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+            </svg>
+          </div>
+          <p class="text-white font-medium mb-1">Arrastra tu video aquí</p>
+          <p class="text-gray-500 text-sm">o haz clic para seleccionar</p>
+          <p class="text-gray-600 text-xs mt-3">MP4, MOV, AVI, MKV, WEBM · Máx. 500MB</p>
+        </div>
+
+        <!-- File selected state -->
+        <div id="dropSelected" class="hidden">
+          <div class="w-16 h-16 rounded-2xl bg-purple-900/40 border border-purple-500/30 flex items-center justify-center mx-auto mb-4">
+            <svg class="w-8 h-8 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M15 10l4.553-2.069A1 1 0 0121 8.87v6.26a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z"/>
+            </svg>
+          </div>
+          <p id="selectedFileName" class="text-white font-medium mb-1 truncate max-w-xs mx-auto"></p>
+          <p id="selectedFileSize" class="text-gray-500 text-sm"></p>
+          <p class="text-purple-400 text-xs mt-2">Clic para cambiar archivo</p>
+        </div>
+      </div>
+
+      <!-- Error message -->
+      <div id="errorMsg" class="hidden mt-4 p-4 rounded-xl bg-red-900/20 border border-red-500/30 text-red-400 text-sm"></div>
+
+      <!-- Submit button -->
+      <button
+        id="submitBtn"
+        onclick="processVideo()"
+        disabled
+        class="mt-6 w-full py-3.5 rounded-xl font-semibold text-white
+               bg-gradient-to-r from-purple-700 to-blue-700
+               disabled:opacity-30 disabled:cursor-not-allowed
+               hover:from-purple-600 hover:to-blue-600
+               transition-all duration-200 shadow-lg shadow-purple-900/30"
+      >
+        Procesar video
+      </button>
+    </div>
+
+    <!-- Progress panel -->
+    <div id="progressPanel" class="hidden glass rounded-2xl p-8 mb-6 fade-in">
+      <h2 class="text-white font-semibold text-lg mb-6">Procesando tu video…</h2>
+
+      <!-- Steps -->
+      <div class="space-y-4 mb-8">
+        <div id="step1" class="step-item waiting flex items-center gap-4">
+          <div class="step-dot w-3 h-3 rounded-full flex-shrink-0 transition-all duration-300"></div>
+          <div>
+            <p class="text-white text-sm font-medium">Extrayendo audio</p>
+            <p class="text-gray-500 text-xs">ffmpeg procesa el video</p>
+          </div>
+        </div>
+        <div id="step2" class="step-item waiting flex items-center gap-4">
+          <div class="step-dot w-3 h-3 rounded-full flex-shrink-0 transition-all duration-300"></div>
+          <div>
+            <p class="text-white text-sm font-medium">Transcribiendo con Groq Whisper</p>
+            <p class="text-gray-500 text-xs">whisper-large-v3 convierte voz a texto</p>
+          </div>
+        </div>
+        <div id="step3" class="step-item waiting flex items-center gap-4">
+          <div class="step-dot w-3 h-3 rounded-full flex-shrink-0 transition-all duration-300"></div>
+          <div>
+            <p class="text-white text-sm font-medium">Generando posts con Claude</p>
+            <p class="text-gray-500 text-xs">claude-sonnet-4-5 redacta los 5 posts</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Progress bar -->
+      <div class="h-2 rounded-full bg-white/5 overflow-hidden">
+        <div id="progressBar" class="progress-bar-inner h-full rounded-full" style="width: 0%"></div>
+      </div>
+      <p id="progressLabel" class="text-gray-500 text-xs mt-2">Iniciando…</p>
+    </div>
+
+    <!-- Results panel -->
+    <div id="resultsPanel" class="hidden">
+
+      <!-- Transcription -->
+      <div class="glass rounded-2xl p-6 mb-4 fade-in">
+        <div class="flex items-center justify-between mb-4">
+          <h2 class="text-white font-semibold flex items-center gap-2">
+            <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            Transcripción
+          </h2>
+          <button onclick="copyTranscription()" class="copy-btn text-xs text-gray-400 border border-white/10 rounded-lg px-3 py-1.5" id="copyTransBtn">
+            Copiar todo
+          </button>
+        </div>
+        <textarea
+          id="transcriptionText"
+          class="w-full h-40 bg-white/3 border border-white/6 rounded-xl p-4 text-gray-300 text-sm leading-relaxed focus:outline-none focus:border-purple-500/40"
+          readonly
+        ></textarea>
+      </div>
+
+      <!-- Posts -->
+      <div class="glass rounded-2xl p-6 mb-6 fade-in">
+        <h2 class="text-white font-semibold mb-5 flex items-center gap-2">
+          <svg class="w-5 h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+              d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+          </svg>
+          Posts generados
+          <span class="ml-auto text-xs text-gray-500 font-normal">5 posts · listos para X</span>
+        </h2>
+        <div id="postsContainer" class="space-y-3"></div>
+      </div>
+
+      <!-- Reset button -->
+      <div class="text-center mb-8 fade-in">
+        <button
+          onclick="resetApp()"
+          class="inline-flex items-center gap-2 py-3 px-8 rounded-xl font-medium text-gray-300 glass hover:border-purple-500/30 hover:text-white transition-all duration-200"
+        >
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/>
+          </svg>
+          Procesar otro video
+        </button>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    let selectedFile = null;
+
+    // ─── Drag & drop ───────────────────────────────────────────────────────────
+
+    const dropZone = document.getElementById('dropZone');
+
+    ['dragenter','dragover'].forEach(evt => {
+      dropZone.addEventListener(evt, e => {
+        e.preventDefault();
+        dropZone.classList.add('drag-over');
+      });
+    });
+
+    ['dragleave','dragend','drop'].forEach(evt => {
+      dropZone.addEventListener(evt, () => dropZone.classList.remove('drag-over'));
+    });
+
+    dropZone.addEventListener('drop', e => {
+      e.preventDefault();
+      const file = e.dataTransfer.files[0];
+      if (file) handleFile(file);
+    });
+
+    document.getElementById('fileInput').addEventListener('change', e => {
+      if (e.target.files[0]) handleFile(e.target.files[0]);
+    });
+
+    function handleFile(file) {
+      const allowed = ['video/mp4','video/quicktime','video/x-msvideo','video/x-matroska','video/webm'];
+      const extOk = /\.(mp4|mov|avi|mkv|webm)$/i.test(file.name);
+
+      if (!extOk) {
+        showError('Formato no soportado. Usa MP4, MOV, AVI, MKV o WEBM.');
+        return;
+      }
+      if (file.size > 500 * 1024 * 1024) {
+        showError('El archivo supera el límite de 500MB.');
+        return;
+      }
+
+      selectedFile = file;
+      hideError();
+
+      document.getElementById('dropDefault').classList.add('hidden');
+      document.getElementById('dropSelected').classList.remove('hidden');
+      document.getElementById('selectedFileName').textContent = file.name;
+      document.getElementById('selectedFileSize').textContent = formatSize(file.size);
+      document.getElementById('submitBtn').disabled = false;
+    }
+
+    function formatSize(bytes) {
+      if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+      return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+    }
+
+    // ─── Upload & process ──────────────────────────────────────────────────────
+
+    async function processVideo() {
+      if (!selectedFile) return;
+
+      showPanel('progressPanel');
+      hideError();
+      setStep(1);
+      setProgress(10, 'Extrayendo audio con ffmpeg…');
+
+      const form = new FormData();
+      form.append('video', selectedFile);
+
+      // Simulate step progression during upload
+      const stepTimer = setTimeout(() => {
+        setStep(2);
+        setProgress(40, 'Transcribiendo con Groq Whisper…');
+      }, 3000);
+
+      const stepTimer2 = setTimeout(() => {
+        setStep(3);
+        setProgress(70, 'Generando posts con Claude Sonnet…');
+      }, 8000);
+
+      try {
+        const res = await fetch('/upload', { method: 'POST', body: form });
+        clearTimeout(stepTimer);
+        clearTimeout(stepTimer2);
+
+        const data = await res.json();
+
+        if (!res.ok) {
+          showPanelWithError(data.error || 'Error inesperado del servidor.');
+          return;
+        }
+
+        setStep(3, true);
+        setProgress(100, '¡Listo!');
+
+        setTimeout(() => renderResults(data), 400);
+
+      } catch (err) {
+        clearTimeout(stepTimer);
+        clearTimeout(stepTimer2);
+        showPanelWithError('Error de red. Verifica que el servidor esté corriendo.');
+      }
+    }
+
+    // ─── Results ───────────────────────────────────────────────────────────────
+
+    function renderResults({ transcription, posts }) {
+      document.getElementById('transcriptionText').value = transcription;
+
+      const container = document.getElementById('postsContainer');
+      container.innerHTML = '';
+
+      posts.forEach((post, i) => {
+        const charCount = post.length;
+        const isOver = charCount > 280;
+
+        const card = document.createElement('div');
+        card.className = 'post-card glass-card rounded-xl p-4 fade-in';
+        card.style.animationDelay = `${i * 80}ms`;
+        card.innerHTML = `
+          <div class="flex items-start justify-between gap-3 mb-3">
+            <span class="text-xs text-gray-500 font-medium">Post ${i + 1}</span>
+            <span class="text-xs ${isOver ? 'text-red-400' : 'text-gray-500'}">${charCount}/280</span>
+          </div>
+          <p class="text-gray-200 text-sm leading-relaxed mb-3">${escapeHtml(post)}</p>
+          <button
+            onclick="copyPost(this, ${JSON.stringify(post)})"
+            class="copy-btn text-xs text-gray-400 border border-white/10 rounded-lg px-3 py-1.5 flex items-center gap-1.5"
+          >
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+            </svg>
+            Copiar
+          </button>
+        `;
+        container.appendChild(card);
+      });
+
+      showPanel('resultsPanel');
+    }
+
+    // ─── Helpers ───────────────────────────────────────────────────────────────
+
+    function showPanel(id) {
+      ['uploadPanel','progressPanel','resultsPanel'].forEach(p => {
+        const el = document.getElementById(p);
+        if (p === id) el.classList.remove('hidden');
+        else el.classList.add('hidden');
+      });
+    }
+
+    function showPanelWithError(msg) {
+      showPanel('uploadPanel');
+      showError(msg);
+    }
+
+    function setStep(n, allDone = false) {
+      for (let i = 1; i <= 3; i++) {
+        const el = document.getElementById(`step${i}`);
+        el.classList.remove('active','done','waiting');
+        if (allDone && i <= n) {
+          el.classList.add('done');
+        } else if (i < n) {
+          el.classList.add('done');
+        } else if (i === n) {
+          el.classList.add('active');
+        } else {
+          el.classList.add('waiting');
+        }
+      }
+    }
+
+    function setProgress(pct, label) {
+      document.getElementById('progressBar').style.width = pct + '%';
+      document.getElementById('progressLabel').textContent = label;
+    }
+
+    function showError(msg) {
+      const el = document.getElementById('errorMsg');
+      el.textContent = msg;
+      el.classList.remove('hidden');
+    }
+
+    function hideError() {
+      document.getElementById('errorMsg').classList.add('hidden');
+    }
+
+    async function copyPost(btn, text) {
+      await navigator.clipboard.writeText(text);
+      btn.classList.add('copied');
+      btn.innerHTML = `
+        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+        </svg>
+        Copiado
+      `;
+      setTimeout(() => {
+        btn.classList.remove('copied');
+        btn.innerHTML = `
+          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+          </svg>
+          Copiar
+        `;
+      }, 2000);
+    }
+
+    async function copyTranscription() {
+      const text = document.getElementById('transcriptionText').value;
+      await navigator.clipboard.writeText(text);
+      const btn = document.getElementById('copyTransBtn');
+      btn.textContent = '✓ Copiado';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copiar todo';
+        btn.classList.remove('copied');
+      }, 2000);
+    }
+
+    function resetApp() {
+      selectedFile = null;
+      document.getElementById('fileInput').value = '';
+      document.getElementById('dropDefault').classList.remove('hidden');
+      document.getElementById('dropSelected').classList.add('hidden');
+      document.getElementById('submitBtn').disabled = true;
+      document.getElementById('postsContainer').innerHTML = '';
+      document.getElementById('transcriptionText').value = '';
+      setStep(1);
+      setProgress(0, 'Iniciando…');
+      showPanel('uploadPanel');
+      hideError();
+    }
+
+    function escapeHtml(str) {
+      return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    }
+  </script>
+</body>
+</html>
