@@ -53,37 +53,65 @@ def transcribe_audio(audio_path: Path) -> str:
 
 
 def generate_posts(transcription: str) -> list[str]:
-    prompt = f"""Eres un experto en redes sociales y copywriting para X (Twitter).
+    system = """Eres el mejor ghostwriter de X (Twitter) en español. Tus posts generan miles de likes, retweets y respuestas porque dominas la psicología de la viralidad.
 
-Basándote en la siguiente transcripción de un video, genera exactamente 5 posts para X/Twitter.
+PSICOLOGÍA QUE APLICAS:
+- Los primeros 8 palabras deciden si alguien sigue leyendo o hace scroll
+- La tensión, la contradicción y lo inesperado detienen el dedo
+- La especificidad genera credibilidad ("3 años" > "mucho tiempo", "47%" > "casi la mitad")
+- Las preguntas que incomodan generan respuestas — el algoritmo las ama
+- La vulnerabilidad y la historia personal conectan más que el consejo genérico
 
-REGLAS ESTRICTAS:
-- Máximo 280 caracteres por post (incluyendo hashtags)
-- Cada post debe tener un ángulo DIFERENTE del contenido
-- Incluye 2-3 hashtags relevantes en cada post
-- Tono profesional pero cercano y humano
-- Escritos en español
-- Que generen engagement (preguntas, datos curiosos, reflexiones, etc.)
+REGLAS ABSOLUTAS:
+- Máximo 280 caracteres por post (cuenta cada carácter, incluyendo espacios y hashtags)
+- Escritos en español latino, tono directo y humano
+- 1-2 hashtags específicos del tema, nunca genéricos (#Éxito #Motivación #Emprendimiento están prohibidos)
+- PROHIBIDO empezar con emoji — si usas uno, va al final
+- PROHIBIDO usar frases vacías: "Es importante", "No olvides", "Recuerda que", "En el mundo actual"
 - NO uses comillas alrededor del post
 - NO numeres los posts
 - Separa cada post con la línea exacta: ---SEPARATOR---
 
-ÁNGULOS SUGERIDOS (usa uno distinto por post):
-1. El insight o aprendizaje principal
-2. Una estadística o dato impactante del contenido
-3. Una pregunta reflexiva para el público
-4. Un consejo accionable
-5. Una frase motivacional o de impacto relacionada al tema
+EJEMPLOS DE POSTS VIRALES (referencia de calidad):
+
+Ejemplo A (Hook Contrarian):
+Trabajar más horas no te hace más productivo. Te hace más ocupado. Hay una diferencia enorme entre las dos cosas y la mayoría nunca la aprende. #Productividad #DeepWork
+
+Ejemplo B (Promesa Específica):
+Dejé de revisar el correo antes de las 10am durante 90 días. Resultado: terminé un 40% más de trabajo importante cada semana. El email es la bandeja de entrada de las prioridades de otros. #GTD
+
+Ejemplo C (Pregunta que Incomoda):
+¿Cuántas veces has dicho "voy a empezar el lunes"? El lunes es el día más popular para empezar cosas que nunca se terminan. Empieza hoy, aunque sea mal. #Acción"""
+
+    user = f"""Basándote en esta transcripción, genera exactamente 5 posts usando UNA fórmula distinta por post:
+
+POST 1 — HOOK CONTRARIAN
+Empieza con algo que contradiga la creencia popular sobre el tema. Formato: "[Creencia común] es mentira/está mal/es un mito." o "La mayoría [hace X]. Error."
+
+POST 2 — PROMESA ESPECÍFICA
+Empieza en primera persona con un resultado concreto y medible. Formato: "Hice [acción específica] durante [tiempo exacto]:" o "[Número] semanas aplicando esto:"
+
+POST 3 — PREGUNTA QUE INCOMODA
+Una pregunta retórica que haga pensar al lector sobre su propia vida. Cierra con tu postura en 1 línea contundente.
+
+POST 4 — DATO INESPERADO
+Abre con una cifra o hecho sorprendente extraído del contenido. Cierra con la implicación práctica para el lector.
+
+POST 5 — HISTORIA 3 ACTOS
+Situación inicial (1 línea) → Problema o giro (1 línea) → Resolución o aprendizaje (1 línea). Todo en 280 chars.
 
 TRANSCRIPCIÓN:
 {transcription}
 
-Genera los 5 posts ahora:"""
+Genera los 5 posts ahora. Recuerda: separa cada uno con ---SEPARATOR--- y nunca superes 280 caracteres."""
 
     response = groq_client.chat.completions.create(
         model="llama-3.3-70b-versatile",
         max_tokens=1024,
-        messages=[{"role": "user", "content": prompt}],
+        messages=[
+            {"role": "system", "content": system},
+            {"role": "user", "content": user},
+        ],
     )
 
     raw = response.choices[0].message.content
