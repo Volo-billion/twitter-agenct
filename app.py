@@ -128,6 +128,8 @@ def upload():
         # Step 1 — extract audio
         try:
             extract_audio(video_path, audio_path)
+        except FileNotFoundError:
+            return jsonify({"error": "ffmpeg no está instalado en el servidor."}), 500
         except RuntimeError as e:
             return jsonify({"error": f"Error extrayendo audio: {str(e)}"}), 500
 
