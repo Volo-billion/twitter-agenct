@@ -53,61 +53,125 @@ def transcribe_audio(audio_path: Path) -> str:
 
 
 def generate_posts(transcription: str) -> list[str]:
-    system = """Eres el mejor ghostwriter de X (Twitter) en español. Tus posts generan miles de likes, retweets y respuestas porque dominas la psicología de la viralidad.
+    system = """Eres el mejor ghostwriter de X (Twitter) en español de habla latina. Escribes posts que paran el scroll, generan miles de likes y convierten lectores en seguidores.
 
-PSICOLOGÍA QUE APLICAS:
-- Los primeros 8 palabras deciden si alguien sigue leyendo o hace scroll
-- La tensión, la contradicción y lo inesperado detienen el dedo
-- La especificidad genera credibilidad ("3 años" > "mucho tiempo", "47%" > "casi la mitad")
-- Las preguntas que incomodan generan respuestas — el algoritmo las ama
-- La vulnerabilidad y la historia personal conectan más que el consejo genérico
+LEYES DE LA VIRALIDAD QUE APLICAS:
+- Los primeros 8 palabras son todo. Si no enganchan, el post muere.
+- Tensión + especificidad + formato correcto = viral
+- Números > adjetivos siempre ("47%" > "casi la mitad", "3 años" > "mucho tiempo")
+- La contradicción y lo inesperado detienen el dedo
+- Las preguntas que incomodan generan replies — el algoritmo las recompensa
+- Voz activa siempre. Nunca pasiva.
 
 REGLAS ABSOLUTAS:
-- Máximo 280 caracteres por post (cuenta cada carácter, incluyendo espacios y hashtags)
-- Escritos en español latino, tono directo y humano
-- 1-2 hashtags específicos del tema, nunca genéricos (#Éxito #Motivación #Emprendimiento están prohibidos)
-- PROHIBIDO empezar con emoji — si usas uno, va al final
-- PROHIBIDO usar frases vacías: "Es importante", "No olvides", "Recuerda que", "En el mundo actual"
-- NO uses comillas alrededor del post
+- Máximo 280 caracteres por post (cuenta espacios, hashtags, saltos de línea)
+- Español latino directo. Sin relleno.
+- 1-2 hashtags ultra-específicos del tema. NUNCA: #Éxito #Motivación #Emprendimiento #Liderazgo
+- PROHIBIDO empezar con emoji — si usas uno, va al final del post
+- PROHIBIDO: "Es importante", "No olvides", "Recuerda que", "En el mundo actual", "Sin duda", "Definitivamente"
+- NO pongas comillas alrededor del post
 - NO numeres los posts
-- Separa cada post con la línea exacta: ---SEPARATOR---
+- Separa cada post con exactamente esta línea: ---SEPARATOR---
 
-EJEMPLOS DE POSTS VIRALES (referencia de calidad):
+EJEMPLOS DE CALIDAD (aprende el nivel):
 
-Ejemplo A (Hook Contrarian):
-Trabajar más horas no te hace más productivo. Te hace más ocupado. Hay una diferencia enorme entre las dos cosas y la mayoría nunca la aprende. #Productividad #DeepWork
+[SHORT - One-Liner Contrarian]
+Trabajar más horas no es productividad. Es ansiedad con sueldo. #DeepWork
 
-Ejemplo B (Promesa Específica):
-Dejé de revisar el correo antes de las 10am durante 90 días. Resultado: terminé un 40% más de trabajo importante cada semana. El email es la bandeja de entrada de las prioridades de otros. #GTD
+[SHORT - Dato Desnudo]
+El 92% de los proyectos "urgentes" del lunes son irrelevantes el viernes.
 
-Ejemplo C (Pregunta que Incomoda):
-¿Cuántas veces has dicho "voy a empezar el lunes"? El lunes es el día más popular para empezar cosas que nunca se terminan. Empieza hoy, aunque sea mal. #Acción"""
+[MID - Hook + Prueba]
+Dejé de revisar email antes de las 10am durante 90 días.
+Resultado: terminé un 40% más trabajo importante por semana.
+El email es la bandeja de entrada de las prioridades de otros. #GTD
 
-    user = f"""Basándote en esta transcripción, genera exactamente 5 posts usando UNA fórmula distinta por post:
+[MID - Historia Micro]
+Renuncié a mi trabajo con $800 en el banco.
+Todos me dijeron que estaba loco.
+Dos años después facturé más que mi ex-jefe. No era locura. Era claridad.
 
-POST 1 — HOOK CONTRARIAN
-Empieza con algo que contradiga la creencia popular sobre el tema. Formato: "[Creencia común] es mentira/está mal/es un mito." o "La mayoría [hace X]. Error."
+[LONG - Argumento Construido]
+La mayoría fracasa en sus metas no por falta de disciplina. Fracasa por metas mal diseñadas.
+Una meta vaga ("quiero ser fit") no activa el cerebro. Una meta específica sí ("bajar 8kg antes del 15 de marzo").
+El problema no eres tú. Es el sistema que usas. Cambia el sistema. #Metas #Productividad"""
 
-POST 2 — PROMESA ESPECÍFICA
-Empieza en primera persona con un resultado concreto y medible. Formato: "Hice [acción específica] durante [tiempo exacto]:" o "[Número] semanas aplicando esto:"
+    user = f"""Genera exactamente 20 posts para X basándote en la transcripción. Usa CADA fórmula UNA sola vez, en este orden exacto:
 
-POST 3 — PREGUNTA QUE INCOMODA
-Una pregunta retórica que haga pensar al lector sobre su propia vida. Cierra con tu postura en 1 línea contundente.
+═══ BLOQUE 1: SHORT COPY (posts 1-6) — máx 120 chars cada uno ═══
 
-POST 4 — DATO INESPERADO
-Abre con una cifra o hecho sorprendente extraído del contenido. Cierra con la implicación práctica para el lector.
+POST 1 — ONE-LINER CONTRARIAN
+Una sola frase que contradiga lo que todos creen. Golpea y termina.
 
-POST 5 — HISTORIA 3 ACTOS
-Situación inicial (1 línea) → Problema o giro (1 línea) → Resolución o aprendizaje (1 línea). Todo en 280 chars.
+POST 2 — DATO DESNUDO
+Solo el número o hecho más impactante del contenido. Sin explicación. La ambigüedad genera replies.
 
-TRANSCRIPCIÓN:
+POST 3 — VERDAD INCÓMODA
+Lo que todos piensan pero nadie se atreve a decir en voz alta sobre este tema.
+
+POST 4 — EL REFRAME
+Toma algo conocido del video y cámbialo de perspectiva en una línea. "X no es Y. Es Z."
+
+POST 5 — DECLARACIÓN BOLD
+Afirmación fuerte y polémica sin justificación. Corta. Genera debate.
+
+POST 6 — EL CLIFFHANGER
+Frase que abre un loop mental sin cerrarlo. Deja al lector queriendo más.
+
+═══ BLOQUE 2: MID COPY (posts 7-14) — 120-220 chars cada uno ═══
+
+POST 7 — HOOK + PRUEBA
+Claim bold en línea 1. Dato concreto que lo respalda en línea 2. Implicación en línea 3.
+
+POST 8 — ANTES / DESPUÉS
+Estado A (1 línea) → qué cambió (1 línea) → Estado B con resultado medible (1 línea).
+
+POST 9 — LOS 3 BULLETS
+Intro de 1 línea + exactamente 3 insights del video en formato bullet "•"
+
+POST 10 — PREGUNTA + RESPUESTA INESPERADA
+Pregunta que parece tener respuesta obvia. Respuesta sorprendente o contraintuitiva.
+
+POST 11 — LA ANALOGÍA
+Explica el concepto más complejo del video usando una metáfora de la vida cotidiana.
+
+POST 12 — FRAMEWORK SIMPLE
+"Para [resultado del video]: • Paso 1 • Paso 2 • Paso 3" — accionable y concreto.
+
+POST 13 — EL PROCESO REVELADO
+"Cómo funciona [tema] en realidad:" + 2-3 líneas con lo que nadie explica así.
+
+POST 14 — HISTORIA MICRO
+Situación reconocible (1 línea) → Giro inesperado (1 línea) → Lección aplicable (1 línea).
+
+═══ BLOQUE 3: LONG COPY (posts 15-20) — 220-280 chars cada uno ═══
+
+POST 15 — HISTORIA COMPLETA
+Setup (contexto, 1 línea) → Conflicto (el problema, 1 línea) → Resolución (qué pasó, 1 línea) → Lección (el takeaway, 1 línea).
+
+POST 16 — ARGUMENTO CONSTRUIDO
+Tesis polémica (1 línea) → Evidencia 1 del video → Evidencia 2 → Conclusión que cambia perspectiva.
+
+POST 17 — THREAD STARTER
+Post que funciona solo pero deja una pregunta abierta al final que invita a seguir. Termina con "Hilo →" o "Te explico:"
+
+POST 18 — MINI CASE STUDY
+Situación real del contenido → acción específica tomada → resultado con número exacto → qué aprender de eso.
+
+POST 19 — LISTA DE VALOR
+"[Número] cosas que [tema del video] enseña sobre [tema mayor de vida/negocios]:" + los items más poderosos.
+
+POST 20 — MANIFIESTO PERSONAL
+Postura personal, clara y sin miedo sobre el tema. Primera persona. Vulnerable y directo. Sin hashtags.
+
+═══ TRANSCRIPCIÓN ═══
 {transcription}
 
-Genera los 5 posts ahora. Recuerda: separa cada uno con ---SEPARATOR--- y nunca superes 280 caracteres."""
+IMPORTANTE: Genera los 20 posts en orden. Separa cada uno con ---SEPARATOR--- Respeta los límites de caracteres por bloque."""
 
     response = groq_client.chat.completions.create(
         model="llama-3.3-70b-versatile",
-        max_tokens=1024,
+        max_tokens=4096,
         messages=[
             {"role": "system", "content": system},
             {"role": "user", "content": user},
@@ -116,7 +180,7 @@ Genera los 5 posts ahora. Recuerda: separa cada uno con ---SEPARATOR--- y nunca 
 
     raw = response.choices[0].message.content
     posts = [p.strip() for p in raw.split("---SEPARATOR---") if p.strip()]
-    return posts[:5]
+    return posts[:20]
 
 
 def cleanup(*paths: Path) -> None:
