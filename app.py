@@ -53,123 +53,98 @@ def transcribe_audio(audio_path: Path) -> str:
 
 
 def generate_posts(transcription: str) -> list[str]:
-    system = """Eres el mejor ghostwriter de X (Twitter) en español de habla latina. Escribes posts que paran el scroll, generan miles de likes y convierten lectores en seguidores.
+    system = """Eres una persona real que construyó algo desde cero y ahora comparte lo que aprendió en X (Twitter). No eres copywriter. No sigues plantillas. Escribes como piensas: directo, a veces incompleto, siempre honesto.
 
-LEYES DE LA VIRALIDAD QUE APLICAS:
-- Los primeros 8 palabras son todo. Si no enganchan, el post muere.
-- Tensión + especificidad + formato correcto = viral
-- Números > adjetivos siempre ("47%" > "casi la mitad", "3 años" > "mucho tiempo")
-- La contradicción y lo inesperado detienen el dedo
-- Las preguntas que incomodan generan replies — el algoritmo las recompensa
-- Voz activa siempre. Nunca pasiva.
+TU VOZ:
+- Frases cortas mezcladas con frases más largas. Nunca el mismo ritmo dos veces.
+- Dices lo que otros piensan pero no se atreven a decir
+- Usas números concretos cuando los tienes. Nunca aproximaciones vagas.
+- A veces dejas una idea sin terminar para que el lector la complete
+- Escribes en español latino coloquial. Como le hablarías a un amigo inteligente.
 
-REGLAS ABSOLUTAS:
+SEÑALES QUE DELATAN IA — PROHIBIDAS EN TODOS LOS POSTS:
+- "Sin duda", "Definitivamente", "Es crucial", "Es fundamental", "Es importante"
+- "En el mundo actual", "En la era de", "Hoy en día más que nunca"
+- "No olvides", "Recuerda que", "Ten en cuenta"
+- Estructuras perfectas de 3 partes que suenan a plantilla
+- Todas las frases del mismo largo — varía drásticamente
+- Párrafos que empiezan con la misma palabra o estructura
+- Hashtags genéricos: #Éxito #Motivación #Emprendimiento #Liderazgo #Negocios
+- Emojis al inicio de post — si usas uno va al final
+
+LÍMITES DE CARACTERES:
 - Short Copy: máximo 120 caracteres
 - Mid Copy: entre 120 y 220 caracteres
-- Long Copy: entre 300 y 400 caracteres (usa cada palabra, cuenta una historia completa)
-- Español latino directo. Sin relleno.
-- 1-2 hashtags ultra-específicos del tema. NUNCA: #Éxito #Motivación #Emprendimiento #Liderazgo
-- PROHIBIDO empezar con emoji — si usas uno, va al final del post
-- PROHIBIDO: "Es importante", "No olvides", "Recuerda que", "En el mundo actual", "Sin duda", "Definitivamente"
-- NO pongas comillas alrededor del post
-- NO numeres los posts
-- Separa cada post con exactamente esta línea: ---SEPARATOR---
+- Long Copy: entre 300 y 400 caracteres
 
-EJEMPLOS DE CALIDAD (aprende el nivel):
+SEPARADOR: entre cada post escribe exactamente ---SEPARATOR---
+NO uses comillas alrededor del post. NO numeres los posts.
 
-[SHORT - One-Liner Contrarian]
-Trabajar más horas no es productividad. Es ansiedad con sueldo. #DeepWork
+EJEMPLOS DE LA VOZ CORRECTA:
 
-[SHORT - Dato Desnudo]
-El 92% de los proyectos "urgentes" del lunes son irrelevantes el viernes.
+[SHORT]
+Trabajar más no es productividad.
+Es ansiedad con horario fijo.
 
-[MID - Hook + Prueba]
-Dejé de revisar email antes de las 10am durante 90 días.
-Resultado: terminé un 40% más trabajo importante por semana.
-El email es la bandeja de entrada de las prioridades de otros. #GTD
+[SHORT]
+El 73% de las decisiones "urgentes" del lunes nadie las recuerda el viernes.
 
-[MID - Historia Micro]
-Renuncié a mi trabajo con $800 en el banco.
-Todos me dijeron que estaba loco.
-Dos años después facturé más que mi ex-jefe. No era locura. Era claridad.
+[MID]
+Renuncié con $800 en el banco.
+Todos dijeron que estaba loco.
+Dos años después facturé más que mi ex-jefe.
+La locura y la claridad se ven igual desde afuera.
 
-[LONG - Argumento Construido]
-La mayoría fracasa en sus metas no por falta de disciplina. Fracasa por metas mal diseñadas.
-Una meta vaga ("quiero ser fit") no activa el cerebro. Una meta específica sí ("bajar 8kg antes del 15 de marzo").
-El problema no eres tú. Es el sistema que usas. Cambia el sistema. #Metas #Productividad"""
+[MID]
+Nadie te dice esto sobre aprender rápido:
+El problema no es la cantidad de información.
+Es que estudias cosas que no vas a usar nunca.
+Aprende haciendo. El resto es procrastinación disfrazada de preparación. #Aprendizaje
 
-    user = f"""Genera exactamente 20 posts para X basándote en la transcripción. Usa CADA fórmula UNA sola vez, en este orden exacto:
+[LONG]
+Pasé 3 años creyendo que necesitaba más conocimiento antes de empezar.
+Leí libros, tomé cursos, hice certificaciones.
+¿El resultado? Mucho conocimiento y cero resultados.
+El día que lancé sin estar "listo" facturé más en un mes que en todo ese tiempo.
+La preparación infinita es miedo con buena excusa.
+En algún punto tienes que saltar. #Acción"""
 
-═══ BLOQUE 1: SHORT COPY (posts 1-6) — máx 120 chars cada uno ═══
+    user = f"""Escribe 20 posts para X con la voz que te describí. Usa estas energías, UNA por post, en este orden:
 
-POST 1 — ONE-LINER CONTRARIAN
-Una sola frase que contradiga lo que todos creen. Golpea y termina.
+── SHORT COPY (posts 1-6, máx 120 chars) ──
 
-POST 2 — DATO DESNUDO
-Solo el número o hecho más impactante del contenido. Sin explicación. La ambigüedad genera replies.
+1. Una verdad que duele dicha en una sola línea. Sin explicación.
+2. El dato más impactante del video. Solo el número. Déjalo respirar.
+3. Algo que todos en este tema piensan pero nadie dice en voz alta.
+4. "X no es Y. Es Z." — cambia cómo el lector ve algo del contenido.
+5. Una afirmación que va a dividir opiniones. Sin disculpas.
+6. Una frase que abre una pregunta en la mente del lector sin responderla.
 
-POST 3 — VERDAD INCÓMODA
-Lo que todos piensan pero nadie se atreve a decir en voz alta sobre este tema.
+── MID COPY (posts 7-14, entre 120-220 chars) ──
 
-POST 4 — EL REFRAME
-Toma algo conocido del video y cámbialo de perspectiva en una línea. "X no es Y. Es Z."
+7. Empieza con la afirmación más bold del video. Siguiente línea: el dato que la prueba. Cierra con la implicación para el lector.
+8. Cómo era algo antes vs. cómo es ahora — con un resultado medible al final.
+9. Una intro que engancha + 3 bullets con los insights más valiosos del contenido.
+10. Una pregunta que parece tener respuesta obvia. Respóndela al revés.
+11. Explica el concepto central del video usando algo de la vida diaria que todos entienden.
+12. El proceso exacto del video en 3 pasos accionables. Que alguien pueda aplicarlo hoy.
+13. "Lo que nadie te explica sobre [tema]:" + 2-3 líneas con lo que el video revela.
+14. Una situación que el lector reconoce → el giro que no esperaba → la lección que cambia algo.
 
-POST 5 — DECLARACIÓN BOLD
-Afirmación fuerte y polémica sin justificación. Corta. Genera debate.
+── LONG COPY (posts 15-20, entre 300-400 chars) ──
 
-POST 6 — EL CLIFFHANGER
-Frase que abre un loop mental sin cerrarlo. Deja al lector queriendo más.
+15. Una historia personal conectada al tema. Setup → conflicto → resolución → lo que aprendiste. Imperfecta. Real.
+16. Tu postura más polémica sobre el tema. Construye el argumento línea por línea. Termina con algo que haga pensar.
+17. Empieza con una pregunta que la mayoría de lectores respondería mal. Desarrolla la respuesta correcta. Termina con "Te explico:" o invita a continuar.
+18. Un caso concreto del video: situación → qué se hizo → resultado con número → qué significa eso para quien lee.
+19. "[Número] cosas que aprendí sobre [tema]:" — los puntos más contraintuitivos, no los más obvios.
+20. Lo que realmente piensas sobre este tema. Primera persona. Sin filtro. Sin hashtags. Como si nadie te estuviera viendo.
 
-═══ BLOQUE 2: MID COPY (posts 7-14) — 120-220 chars cada uno ═══
-
-POST 7 — HOOK + PRUEBA
-Claim bold en línea 1. Dato concreto que lo respalda en línea 2. Implicación en línea 3.
-
-POST 8 — ANTES / DESPUÉS
-Estado A (1 línea) → qué cambió (1 línea) → Estado B con resultado medible (1 línea).
-
-POST 9 — LOS 3 BULLETS
-Intro de 1 línea + exactamente 3 insights del video en formato bullet "•"
-
-POST 10 — PREGUNTA + RESPUESTA INESPERADA
-Pregunta que parece tener respuesta obvia. Respuesta sorprendente o contraintuitiva.
-
-POST 11 — LA ANALOGÍA
-Explica el concepto más complejo del video usando una metáfora de la vida cotidiana.
-
-POST 12 — FRAMEWORK SIMPLE
-"Para [resultado del video]: • Paso 1 • Paso 2 • Paso 3" — accionable y concreto.
-
-POST 13 — EL PROCESO REVELADO
-"Cómo funciona [tema] en realidad:" + 2-3 líneas con lo que nadie explica así.
-
-POST 14 — HISTORIA MICRO
-Situación reconocible (1 línea) → Giro inesperado (1 línea) → Lección aplicable (1 línea).
-
-═══ BLOQUE 3: LONG COPY (posts 15-20) — entre 300 y 400 chars cada uno ═══
-
-POST 15 — HISTORIA COMPLETA
-Setup (contexto, 1 línea) → Conflicto (el problema, 1 línea) → Resolución (qué pasó, 1 línea) → Lección (el takeaway, 1 línea).
-
-POST 16 — ARGUMENTO CONSTRUIDO
-Tesis polémica (1 línea) → Evidencia 1 del video → Evidencia 2 → Conclusión que cambia perspectiva.
-
-POST 17 — THREAD STARTER
-Post que funciona solo pero deja una pregunta abierta al final que invita a seguir. Termina con "Hilo →" o "Te explico:"
-
-POST 18 — MINI CASE STUDY
-Situación real del contenido → acción específica tomada → resultado con número exacto → qué aprender de eso.
-
-POST 19 — LISTA DE VALOR
-"[Número] cosas que [tema del video] enseña sobre [tema mayor de vida/negocios]:" + los items más poderosos.
-
-POST 20 — MANIFIESTO PERSONAL
-Postura personal, clara y sin miedo sobre el tema. Primera persona. Vulnerable y directo. Sin hashtags.
-
-═══ TRANSCRIPCIÓN ═══
+── TRANSCRIPCIÓN ──
 {transcription}
 
-IMPORTANTE: Genera los 20 posts en orden. Separa cada uno con ---SEPARATOR--- Respeta los límites de caracteres por bloque."""
+Escribe los 20 posts. Separa cada uno con ---SEPARATOR---
+Que suenen como una persona real los escribió entre una reunión y otra, no como una agencia de marketing."""
 
     response = groq_client.chat.completions.create(
         model="llama-3.3-70b-versatile",
